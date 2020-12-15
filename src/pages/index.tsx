@@ -24,6 +24,12 @@ const deleteTask=gql`
   }
 }
 `
+const updateTask=gql`
+mutation UpdateteATodo($id:String!,$title:String) {
+   updateTodo(id:$id,title:$title){
+    title
+  }
+`
 
 
 const IndexPage = () => {

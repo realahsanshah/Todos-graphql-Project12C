@@ -20,6 +20,7 @@ const typeDefs = gql`
   type Mutation {
     addTodo(title:String):todo
     deleteTodo(id:String):todo
+    updateTodo(id:String,title:String):todo
   }
 
 `;
@@ -78,6 +79,32 @@ const resolvers = {
       /* construct the fauna query */
       try{
         const result=await client.query(query.Delete(query.Ref(query.Collection('todos'),id)))
+        console.log("result",result);
+
+        return {
+          title:result.data.title,
+          id:result.ref.id
+        }
+      }
+      catch(error){
+        console.log("Error",error);
+        return {
+          title:"error",
+          id:"1"
+        }
+      }
+    },
+    updateTodo:async (_,{id,title})=>{
+      console.log("id",id)
+      /* construct the fauna query */
+      const item = {
+        data:{title:title}
+      }
+      try{
+        const result=await client.query(query.Update(
+          query.Ref(query.Collection('todos'),id),
+          item,
+        ))
         console.log("result",result);
 
         return {
