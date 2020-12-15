@@ -11,7 +11,7 @@ const getTodos=gql`
 
 const addTask=gql`
   mutation CreateATodo($title:String!) {
-   addTodo(title:$tit){
+   addTodo(title:$title){
     title
   }
 }
