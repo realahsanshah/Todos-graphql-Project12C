@@ -1,6 +1,4 @@
 import * as React from "react"
-import {useQuery} from '@apollo/client';
-import gql from 'graphql-tag'
 import Todos from '../components/Todos';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 

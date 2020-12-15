@@ -117,6 +117,8 @@ const Todos: React.SFC<TodosProps> = () => {
     const [currentTitle,setCurrentTitle]=React.useState('');
 
     const [addTodo] = useMutation(addTask)
+    const [deleteTodo] = useMutation(deleteTask)
+    const [updateTodo] = useMutation(updateTask)
 
     React.useEffect(() => {
         ; (async () => {
@@ -143,7 +145,7 @@ const Todos: React.SFC<TodosProps> = () => {
                     onSubmit={(value, { resetForm }) => {
                         console.log('todo', value.todo)
                         setTodo('')
-                        addTodo({variables:{title:value.todo}});
+                        addTodo({variables:{title:value.todo},refetchQueries: [{ query: getTodos }],});
                         resetForm();
                         setFetchData(true);
                         setIsUpdate(false);
@@ -212,12 +214,25 @@ const Todos: React.SFC<TodosProps> = () => {
                                                     onSubmit={(value, { resetForm }) => {
                                                         console.log('todo', value.todo)
                                                         // updateTodo(currentId, value.todo)
+                                                        updateTodo({variables:{
+                                                            id:currentId,
+                                                            title:value.todo
+                                                        },
+                                                        refetchQueries: [{ query: getTodos }],
+                                                    })
                                                         resetForm();
                                                         setFetchData(true);
                                                         setIsUpdate(false);
                                                         setCurrentId(null);
                                                         setCurrentTitle('');
                                                         handleClose();
+                                                        Swal.fire({
+                                                            position: 'center',
+                                                            icon: 'success',
+                                                            title: 'A todo is updated',
+                                                            showConfirmButton: false,
+                                                            timer: 1500
+                                                          })
                                                     }}
 
                                                 >
@@ -266,9 +281,19 @@ const Todos: React.SFC<TodosProps> = () => {
                                             <CreateOutlinedIcon />
                                         </IconButton>
                                         <IconButton edge="end" aria-label="delete" onClick={async () => {
-                                            // console.log('Delete Button', todo.ref['@ref'].id);
-                                            // var result = await deleteTodo(todo.ref['@ref'].id);
-                                            // console.log("result", result);
+                                            deleteTodo({
+                                                variables:{
+                                                    id:todo.id
+                                                },
+                                                refetchQueries: [{ query: getTodos }],
+                                            })
+                                            Swal.fire({
+                                                position: 'center',
+                                                icon: 'success',
+                                                title: 'A todo is deleted',
+                                                showConfirmButton: false,
+                                                timer: 1500
+                                              })
                                             setFetchData(true);
                                         }}>
                                             <DeleteIcon />
