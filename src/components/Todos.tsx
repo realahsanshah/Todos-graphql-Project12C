@@ -65,6 +65,30 @@ const getTodos=gql`
   }
 `
 
+
+const addTask=gql`
+  mutation CreateATodo($title:String!) {
+   addTodo(title:$title){
+    title
+  }
+}
+`
+
+const deleteTask=gql`
+  mutation DeleteATodo($id:String!) {
+   deleteTodo(id:$id){
+    title
+  }
+}
+`
+const updateTask=gql`
+mutation UpdateteATodo($id:String!,$title:String) {
+   updateTodo(id:$id,title:$title){
+    title
+  }
+}
+`
+
 export interface TodosProps {
 
 }
@@ -83,12 +107,23 @@ const Todos: React.SFC<TodosProps> = () => {
     const classes=useStyles();
     const {loading,error,data,refetch} = useQuery(getTodos);
     const [todos,setTodos]=React.useState(data);
+    const [todo,setTodo]=React.useState('');
+    const [isUpdate,setIsUpdate]=React.useState(false);
     const [fetchData, setFetchData] = React.useState(loading)
     const [isLoading,setIsLoading]=React.useState(false);
     const [open, setOpen] = React.useState(false);
     const [modalStyle] = React.useState(getModalStyle);
     const [currentId, setCurrentId] = React.useState(null);
     const [currentTitle,setCurrentTitle]=React.useState('');
+
+    const [addTodo] = useMutation(addTask)
+
+    React.useEffect(() => {
+        ; (async () => {
+            refetch();
+            setFetchData(false);
+        })()
+    }, [fetchData])
 
 
     const handleOpen = () => {
@@ -101,6 +136,58 @@ const Todos: React.SFC<TodosProps> = () => {
 
     return(
         <div>
+             <div>
+                <Formik
+                    initialValues={{ todo: todo }}
+                    validationSchema={schema}
+                    onSubmit={(value, { resetForm }) => {
+                        console.log('todo', value.todo)
+                        setTodo('')
+                        addTodo({variables:{title:value.todo}});
+                        resetForm();
+                        setFetchData(true);
+                        setIsUpdate(false);
+                        setCurrentId(null);
+                        
+                    }}
+
+                >
+                    {(formik: any) => (
+                        <Form onSubmit={formik.handleSubmit}>
+                            <Grid container justify="center">
+                                <Grid item xs={12} sm={4}>
+                                    <div>
+                                        <Field
+                                            type='todo'
+                                            as={TextField}
+                                            variant="outlined"
+                                            label="Todo"
+                                            name="todo"
+                                            id="todo"
+                                            className={classes.textField}
+                                        />
+                                        <br />
+                                        <ErrorMessage name='todo' render={(msg: string) => (
+                                            <span style={{ color: "red", fontSize: '18sp' }}>{msg}</span>
+                                        )} />
+                                        <br />
+                                    </div>
+
+                                    <div>
+                                        <Button variant="contained" color="primary" type="submit" className={classes.textField} >
+                                            Add Todo
+                                        </Button>
+                                    </div>
+                                </Grid>
+                            </Grid>
+                        </Form>
+                    )}
+
+                </Formik>
+            </div>
+
+
+
             {loading &&<CircularProgress />}
             {data &&  <Grid container justify="center">
                 <Grid item xs={12} sm={4}>
@@ -127,7 +214,7 @@ const Todos: React.SFC<TodosProps> = () => {
                                                         // updateTodo(currentId, value.todo)
                                                         resetForm();
                                                         setFetchData(true);
-                                                        // setIsUpdate(false);
+                                                        setIsUpdate(false);
                                                         setCurrentId(null);
                                                         setCurrentTitle('');
                                                         handleClose();
@@ -166,16 +253,14 @@ const Todos: React.SFC<TodosProps> = () => {
                                                     )}
 
                                                 </Formik>
-
                                             </div>
-
                                         </Modal>
                                         <IconButton edge="end" aria-label="delete" onClick={() => {
-                                            // console.log('Update Button', todo.ref['@ref'].id);
-                                            // setTodo(todo.data.title);
-                                            // setCurrentId(todo.ref['@ref'].id)
-                                            // setCurrentTitle(todo.data.title)
-                                            // setIsUpdate(true);
+                                            console.log('Update Button', todo.id);
+                                            setTodo(todo.title);
+                                            setCurrentId(todo.id)
+                                            setCurrentTitle(todo.title)
+                                            setIsUpdate(true);
                                             setOpen(true)
                                         }}>
                                             <CreateOutlinedIcon />
