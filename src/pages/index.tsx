@@ -3,15 +3,23 @@ import {useQuery} from '@apollo/client';
 import gql from 'graphql-tag'
 
 
-const APOLLO_QUERY=gql`
+const getTodos=gql`
   {
     todos
   }
 `
 
+const addTask=gql`
+  mutation CreateATodo($title:String!) {
+   addTodo(title:$tit){
+    title
+  }
+}
+`
+
 
 const IndexPage = () => {
-  const {loading,error,data}=useQuery(APOLLO_QUERY);
+  const {loading,error,data}=useQuery(getTodos);
   
   return (
     <main>
