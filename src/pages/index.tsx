@@ -17,6 +17,14 @@ const addTask=gql`
 }
 `
 
+const deleteTask=gql`
+  mutation DeleteATodo($id:String!) {
+   deleteTodo(id:$id){
+    title
+  }
+}
+`
+
 
 const IndexPage = () => {
   const {loading,error,data}=useQuery(getTodos);
