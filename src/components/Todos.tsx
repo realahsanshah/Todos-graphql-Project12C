@@ -53,6 +53,7 @@ function getModalStyle() {
         top: `${top}%`,
         left: `${left}%`,
         transform: `translate(-${top}%, -${left}%)`,
+        alignItems: "center", justifyContent: "center" 
     };
 }
 
